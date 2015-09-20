@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,12 +81,12 @@ public class MainActivityFragment extends Fragment {
         movieTask.execute();
     }
 
-    public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
+    public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected String[] doInBackground(Void... params) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -149,8 +153,38 @@ public class MainActivityFragment extends Fragment {
                 }
             }
 
+            // Parse the JSON movie data
+            try {
+                String[] movieList = getMovieList(movieJsonStr);
+                for(int i = 0; i < movieList.length; i++) {
+                    Log.v(LOG_TAG, "Movie " + i + ": " + movieList[i]);
+                }
+                return movieList;
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                e.printStackTrace();
+            }
+
             return null;
         }
 
+        private String[] getMovieList(String movieJsonStr)
+                throws JSONException {
+
+            // These are the names of the JSON objects that need to be extracted.
+            final String TMDB_RESULTS = "results";
+            final String TMDB_ORIGINAL_TITLE = "original_title";
+
+            JSONObject movieJson = new JSONObject(movieJsonStr);
+            JSONArray movieArray = movieJson.getJSONArray(TMDB_RESULTS);
+
+            String[] resultList = new String[movieArray.length()];
+            for (int i = 0; i < movieArray.length(); i++) {
+                String movieOriginaTitle = movieArray.getJSONObject(i).getString(TMDB_ORIGINAL_TITLE);
+                resultList[i] = movieOriginaTitle;
+            }
+
+            return resultList;
+        }
     }
 }
