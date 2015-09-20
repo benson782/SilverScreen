@@ -168,6 +168,17 @@ public class MainActivityFragment extends Fragment {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result != null) {
+                mMovieAdapter.clear();
+                for (String movieTitleStr : result) {
+                    mMovieAdapter.add(movieTitleStr);
+                }
+                // New data is back from the server.  Hooray!
+            }
+        }
+
         private String[] getMovieList(String movieJsonStr)
                 throws JSONException {
 
