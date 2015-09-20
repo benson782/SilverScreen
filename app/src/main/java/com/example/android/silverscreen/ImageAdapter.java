@@ -1,6 +1,7 @@
 package com.example.android.silverscreen;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -12,11 +13,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 
-public class ImageAdapter extends ArrayAdapter<String> {
+public class ImageAdapter extends ArrayAdapter<Movie> {
 
     private final String LOG_TAG = ImageAdapter.class.getSimpleName();
 
-    public ImageAdapter(Context context, ArrayList<String> str) {
+    public ImageAdapter(Context context, ArrayList<Movie> str) {
         super(context, 0, str);
     }
 
@@ -32,7 +33,9 @@ public class ImageAdapter extends ArrayAdapter<String> {
         }
 
         // Use Picasso to fetch the image and set in the ImageView
-        String url = getContext().getString(R.string.url_prefix_movie_poster) + getItem(position);
+        String posterPath = getItem(position).getPosterPath();
+        String url = getContext().getString(R.string.url_prefix_movie_poster) + posterPath;
+        Log.d(LOG_TAG, "Movie Poster URL: " + url);
         Picasso.with(getContext()).load(url).fit().centerCrop().into(imageView);
 
         return imageView;

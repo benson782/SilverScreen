@@ -42,7 +42,7 @@ public class MovieFragment extends Fragment {
 
         // The ImageAdapter will take data from a source and
         // use it to populate the ListView it's attached to.
-        mMovieAdapter = new ImageAdapter(getActivity(), new ArrayList<String>());
+        mMovieAdapter = new ImageAdapter(getActivity(), new ArrayList<Movie>());
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -53,7 +53,8 @@ public class MovieFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), "" + position, Toast.LENGTH_SHORT).show();
+                Movie movie = mMovieAdapter.getItem(position);
+                Toast.makeText(getActivity(), movie.getTitle(), Toast.LENGTH_SHORT).show();
                 /*Intent intent = new Intent(getActivity(), DetailActivity.class)
                         .putExtra(Intent.EXTRA_TEXT, forecast);
                 startActivity(intent);*/
@@ -77,12 +78,12 @@ public class MovieFragment extends Fragment {
         movieTask.execute();
     }
 
-    public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
+    public class FetchMovieTask extends AsyncTask<Void, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
         @Override
-        protected String[] doInBackground(Void... params) {
+        protected Movie[] doInBackground(Void... params) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -150,11 +151,11 @@ public class MovieFragment extends Fragment {
 
             // Parse the JSON movie data
             try {
-                String[] list = getMoviePosterPathList(movieJsonStr);
-                for (int i = 0; i < list.length; i++) {
-                    Log.v(LOG_TAG, "Movie " + i + ": " + list[i]);
+                Movie[] movieList = getMovieDataFromJson(movieJsonStr);
+                for (int i = 0; i < movieList.length; i++) {
+                    Log.v(LOG_TAG, "Movie " + i + ": " + movieList[i].getTitle());
                 }
-                return list;
+                return movieList;
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -164,50 +165,32 @@ public class MovieFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] result) {
+        protected void onPostExecute(Movie[] result) {
             if (result != null) {
                 mMovieAdapter.clear();
-                for (String str : result) {
-                    mMovieAdapter.add(str);
+                for (Movie movie : result) {
+                    mMovieAdapter.add(movie);
                 }
                 // New data is back from the server.  Hooray!
             }
         }
 
-        private String[] getMovieList(String movieJsonStr)
-                throws JSONException {
-
+        private Movie[] getMovieDataFromJson(String movieJsonStr) throws JSONException {
             // These are the names of the JSON objects that need to be extracted.
             final String TMDB_RESULTS = "results";
+            final String TMDB_ID = "id";
             final String TMDB_ORIGINAL_TITLE = "original_title";
-            //final String TMDB_POSTER_PATH = "poster_path";
-
-            JSONObject movieJson = new JSONObject(movieJsonStr);
-            JSONArray movieArray = movieJson.getJSONArray(TMDB_RESULTS);
-
-            String[] resultList = new String[movieArray.length()];
-            for (int i = 0; i < movieArray.length(); i++) {
-                String movieOriginalTitle = movieArray.getJSONObject(i).getString(TMDB_ORIGINAL_TITLE);
-                resultList[i] = movieOriginalTitle;
-            }
-
-            return resultList;
-        }
-
-        private String[] getMoviePosterPathList(String movieJsonStr)
-                throws JSONException {
-
-            // These are the names of the JSON objects that need to be extracted.
-            final String TMDB_RESULTS = "results";
             final String TMDB_POSTER_PATH = "poster_path";
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
             JSONArray movieArray = movieJson.getJSONArray(TMDB_RESULTS);
 
-            String[] resultList = new String[movieArray.length()];
+            Movie[] resultList = new Movie[movieArray.length()];
             for (int i = 0; i < movieArray.length(); i++) {
+                String movieId = movieArray.getJSONObject(i).getString(TMDB_ID);
+                String movieOriginalTitle = movieArray.getJSONObject(i).getString(TMDB_ORIGINAL_TITLE);
                 String moviePosterPath = movieArray.getJSONObject(i).getString(TMDB_POSTER_PATH);
-                resultList[i] = moviePosterPath;
+                resultList[i] = new Movie(movieId, movieOriginalTitle,moviePosterPath);
             }
 
             return resultList;
