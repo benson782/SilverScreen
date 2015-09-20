@@ -26,14 +26,14 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MovieFragment extends Fragment {
 
-    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+    private final String LOG_TAG = MovieFragment.class.getSimpleName();
 
     //private ArrayAdapter<String> mMovieAdapter;
     private ImageAdapter mMovieAdapter;
 
-    public MainActivityFragment() {
+    public MovieFragment() {
     }
 
     @Override
