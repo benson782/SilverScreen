@@ -7,8 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,16 +63,17 @@ public class MainActivityFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.gridview_movie);
         gridView.setAdapter(mMovieAdapter);
-/*        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = mForecastAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                String movie = mMovieAdapter.getItem(position);
+                Toast.makeText(getActivity(), movie, Toast.LENGTH_SHORT).show();
+                /*Intent intent = new Intent(getActivity(), DetailActivity.class)
                         .putExtra(Intent.EXTRA_TEXT, forecast);
-                startActivity(intent);
+                startActivity(intent);*/
             }
         });
-*/
+
         updateMovies();
 
         return rootView;
@@ -99,8 +102,7 @@ public class MainActivityFragment extends Fragment {
                 // Construct the URL for the The Movies DB query
                 // Possible parameters are available at TMDb's API page, at
                 // http://openweathermap.org/API#forecast
-                URL url = new URL(
-                        "http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" +
+                URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" +
                         getString(R.string.my_api_key));
 
                 // Create the request to OpenWeatherMap, and open the connection
@@ -133,7 +135,7 @@ public class MainActivityFragment extends Fragment {
                 }
                 movieJsonStr = buffer.toString();
 
-                Log.v(LOG_TAG,"Movie data: " + movieJsonStr);
+                Log.v(LOG_TAG, "Movie data: " + movieJsonStr);
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
@@ -156,7 +158,7 @@ public class MainActivityFragment extends Fragment {
             // Parse the JSON movie data
             try {
                 String[] movieList = getMovieList(movieJsonStr);
-                for(int i = 0; i < movieList.length; i++) {
+                for (int i = 0; i < movieList.length; i++) {
                     Log.v(LOG_TAG, "Movie " + i + ": " + movieList[i]);
                 }
                 return movieList;
@@ -185,14 +187,15 @@ public class MainActivityFragment extends Fragment {
             // These are the names of the JSON objects that need to be extracted.
             final String TMDB_RESULTS = "results";
             final String TMDB_ORIGINAL_TITLE = "original_title";
+            //final String TMDB_POSTER_PATH = "poster_path";
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
             JSONArray movieArray = movieJson.getJSONArray(TMDB_RESULTS);
 
             String[] resultList = new String[movieArray.length()];
             for (int i = 0; i < movieArray.length(); i++) {
-                String movieOriginaTitle = movieArray.getJSONObject(i).getString(TMDB_ORIGINAL_TITLE);
-                resultList[i] = movieOriginaTitle;
+                String movieOriginalTitle = movieArray.getJSONObject(i).getString(TMDB_ORIGINAL_TITLE);
+                resultList[i] = movieOriginalTitle;
             }
 
             return resultList;
