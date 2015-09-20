@@ -95,8 +95,8 @@ public class MovieFragment extends Fragment {
                 // Construct the URL for the The Movies DB query
                 // Possible parameters are available at TMDb's API page, at
                 // http://openweathermap.org/API#forecast
-                URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=" +
-                        getString(R.string.my_api_key));
+                URL url = new URL(getString(R.string.url_prefix_popular_desc) +
+                        "&api_key=" + getString(R.string.my_api_key));
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();

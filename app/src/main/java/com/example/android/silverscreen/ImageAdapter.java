@@ -32,7 +32,7 @@ public class ImageAdapter extends ArrayAdapter<String> {
         }
 
         // Use Picasso to fetch the image and set in the ImageView
-        String url = "http://image.tmdb.org/t/p/w185" + getItem(position);
+        String url = getContext().getString(R.string.url_prefix_movie_poster) + getItem(position);
         Picasso.with(getContext()).load(url).fit().centerCrop().into(imageView);
 
         return imageView;
