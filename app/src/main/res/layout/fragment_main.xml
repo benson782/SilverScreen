@@ -12,10 +12,12 @@
         android:id="@+id/gridview_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:columnWidth="90dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"
-        android:numColumns="2"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="10dp" />
+        android:gravity="center"
+ />
 
 </RelativeLayout>
