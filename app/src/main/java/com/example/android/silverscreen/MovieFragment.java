@@ -30,10 +30,11 @@ import java.util.ArrayList;
 public class MovieFragment extends Fragment {
 
     private final String LOG_TAG = MovieFragment.class.getSimpleName();
+    private final Integer MAX_MOVIE_PAGE = 10;
 
     private ImageAdapter mMovieAdapter;
-
     private Boolean mGridViewBottom = false;
+    private Integer mPagesLoaded = 0;
 
     public MovieFragment() {
     }
@@ -72,9 +73,10 @@ public class MovieFragment extends Fragment {
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem + visibleItemCount >= totalItemCount) {
-                    if (mGridViewBottom == false && mMovieAdapter.isEmpty() == false) {
+                    if (mGridViewBottom == false && mPagesLoaded > 0) {
                         Log.d(LOG_TAG, "Bottom of GridView");
                         mGridViewBottom = true;
+                        updateMovies();
                     }
 
                 } else {
@@ -94,17 +96,20 @@ public class MovieFragment extends Fragment {
     }
 
     private void updateMovies() {
-        FetchMovieTask movieTask = new FetchMovieTask();
-        Log.d(LOG_TAG, "Fetching movies");
-        movieTask.execute();
+        if (mPagesLoaded < MAX_MOVIE_PAGE) {
+            FetchMovieTask movieTask = new FetchMovieTask();
+            mPagesLoaded++;
+            Log.d(LOG_TAG, "Fetching movies page " + mPagesLoaded);
+            movieTask.execute(mPagesLoaded);
+        }
     }
 
-    public class FetchMovieTask extends AsyncTask<Void, Void, Movie[]> {
+    public class FetchMovieTask extends AsyncTask<Integer, Void, Movie[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
         @Override
-        protected Movie[] doInBackground(Void... params) {
+        protected Movie[] doInBackground(Integer... params) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -117,7 +122,9 @@ public class MovieFragment extends Fragment {
                 // Construct the URL for the The Movies DB query
                 // Possible parameters are available at TMDb's API page, at
                 // http://openweathermap.org/API#forecast
+                String page = Integer.toString(params[0]);
                 URL url = new URL(getString(R.string.url_prefix_popular_desc) +
+                        "&page=" + page +
                         "&api_key=" + getString(R.string.my_api_key));
 
                 // Create the request to OpenWeatherMap, and open the connection
@@ -188,7 +195,6 @@ public class MovieFragment extends Fragment {
         @Override
         protected void onPostExecute(Movie[] result) {
             if (result != null) {
-                mMovieAdapter.clear();
                 for (Movie movie : result) {
                     mMovieAdapter.add(movie);
                 }
