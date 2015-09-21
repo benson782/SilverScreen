@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
@@ -30,8 +31,9 @@ public class MovieFragment extends Fragment {
 
     private final String LOG_TAG = MovieFragment.class.getSimpleName();
 
-    //private ArrayAdapter<String> mMovieAdapter;
     private ImageAdapter mMovieAdapter;
+
+    private Boolean mGridViewBottom = false;
 
     public MovieFragment() {
     }
@@ -61,7 +63,26 @@ public class MovieFragment extends Fragment {
             }
         });
 
-        //updateMovies();
+        gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem + visibleItemCount >= totalItemCount) {
+                    if (mGridViewBottom == false && mMovieAdapter.isEmpty() == false) {
+                        Log.d(LOG_TAG, "Bottom of GridView");
+                        mGridViewBottom = true;
+                    }
+
+                } else {
+                    mGridViewBottom = false;
+                }
+            }
+        });
+
 
         return rootView;
     }
@@ -190,7 +211,7 @@ public class MovieFragment extends Fragment {
                 String movieId = movieArray.getJSONObject(i).getString(TMDB_ID);
                 String movieOriginalTitle = movieArray.getJSONObject(i).getString(TMDB_ORIGINAL_TITLE);
                 String moviePosterPath = movieArray.getJSONObject(i).getString(TMDB_POSTER_PATH);
-                resultList[i] = new Movie(movieId, movieOriginalTitle,moviePosterPath);
+                resultList[i] = new Movie(movieId, movieOriginalTitle, moviePosterPath);
             }
 
             return resultList;
