@@ -12,9 +12,9 @@
         android:id="@+id/gridview_movie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth"
+        android:background="@android:color/black"
         android:gravity="center"
- />
+        android:numColumns="auto_fit"
+        android:stretchMode="columnWidth" />
 
 </RelativeLayout>
