@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -17,8 +16,8 @@ public class ImageAdapter extends ArrayAdapter<Movie> {
 
     private final String LOG_TAG = ImageAdapter.class.getSimpleName();
 
-    public ImageAdapter(Context context, ArrayList<Movie> str) {
-        super(context, 0, str);
+    public ImageAdapter(Context context, ArrayList<Movie> movie) {
+        super(context, 0, movie);
     }
 
     @Override
@@ -27,7 +26,8 @@ public class ImageAdapter extends ArrayAdapter<Movie> {
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(getContext());
-            imageView.setLayoutParams(new GridView.LayoutParams(185 * 2, 277 * 2));
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setAdjustViewBounds(true);
         } else {
             imageView = (ImageView) convertView;
         }
@@ -36,7 +36,9 @@ public class ImageAdapter extends ArrayAdapter<Movie> {
         String posterPath = getItem(position).getPosterPath();
         String url = getContext().getString(R.string.url_prefix_movie_poster) + posterPath;
         Log.d(LOG_TAG, "Movie Poster URL: " + url);
-        Picasso.with(getContext()).load(url).fit().centerCrop().into(imageView);
+        Picasso.with(getContext())
+                .load(url)
+                .into(imageView);
 
         return imageView;
     }
